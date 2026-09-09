@@ -56,7 +56,7 @@ jobs:
         run: |
            touch report.html
            chmod 777 report.html
-           docker run --rm -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r report.html -I
+           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r report.html -I
         continue-on-error: true
         
       - name: Upload DAST HTML Report
