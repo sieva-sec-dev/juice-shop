@@ -10,30 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Скачиваем код
+      # Шаг 1: Просто скачиваем файлы проекта из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Шаг 2: Устанавливаем Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      # Шаг 3: ИСПРАВЛЕНО. Скачиваем зависимости БЕЗ запуска скриптов сборки (ignore-scripts)
-      - name: Install Dependencies Safely
-        run: npm install --package-lock-only --legacy-peer-deps
-
-      # Шаг 4: Поиск секретов (Gitleaks)
+      # Шаг 2: Поиск секретов (Gitleaks)
       - name: Run Gitleaks (Secrets)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      # Шаг 5: ИСПРАВЛЕНО. Указываем Trivy сканировать проект напрямую
+      # Шаг 3: Проверка библиотек (Trivy). Он сам найдет файл package.json и проверит его
       - name: Run Trivy (SCA)
         uses: aquasecurity/trivy-action@master
         with:
@@ -43,7 +33,7 @@ jobs:
           severity: 'HIGH,CRITICAL'
         continue-on-error: true
 
-      # Шаг 6: Проверяем сам код на баги безопасности (Semgrep)
+      # Шаг 4: Сканирование самого кода на уязвимости (Semgrep)
       - name: Run Semgrep (SAST)
         run: |
           pip install semgrep
