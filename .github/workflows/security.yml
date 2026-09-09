@@ -4,7 +4,6 @@ on:
   push:
     branches: [ "master", "main" ]
 
-# Даем роботу права записывать результаты в раздел Security вашего репозитория
 permissions:
   security-events: write
   contents: read
@@ -20,24 +19,27 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Run Gitleaks (Secrets)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      
       - name: Run Trivy (SCA)
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'vuln'
+          scan-type: 'image'
+          image-ref: 'bkimminich/juice-shop:latest'
           format: 'table'
           severity: 'HIGH,CRITICAL'
         continue-on-error: true
 
-      # ИСПРАВЛЕНО: Теперь Semgrep сохраняет результаты в файл и передает их в GitHub
       - name: Run Semgrep (SAST)
         run: |
           pip install semgrep
           semgrep scan --config auto --sarif --output semgrep-results.sarif
         continue-on-error: true
 
-      # Новый шаг: Загружаем файл с результатами в интерфейс GitHub
       - name: Upload Semgrep Results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
