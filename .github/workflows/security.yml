@@ -54,13 +54,17 @@ jobs:
             
       - name: Run OWASP ZAP Baseline Scan
         run: |
-           touch report.html
-           docker run --rm --user $(id -u):$(id -g) -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r report.html -I
+           docker run --rm -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r report.html -I
         continue-on-error: true
+
+      - name: Fix Report File Permissions
+        run: |
+          sudo chmod 777 report.html
+        if: always()
         
-      - name: Save DAST Report Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload DAST HTML Report
+        uses: actions/artifact@v4
         with:
-              name: owasp-zap-dast-report
-              path: report.html
+          name: zap-dast-vulnerabilities-report
+          path: report.html
        
