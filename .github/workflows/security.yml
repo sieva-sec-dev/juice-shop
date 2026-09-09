@@ -16,15 +16,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Шаг 2: Устанавливаем Node.js (нужен для сборки Juice Shop)
+      # Шаг 2: Устанавливаем Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # Шаг 3: Скачиваем все зависимости, чтобы Trivy смог их увидеть
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+      # Шаг 3: ИСПРАВЛЕНО. Скачиваем зависимости БЕЗ запуска скриптов сборки (ignore-scripts)
+      - name: Install Dependencies Safely
+        run: npm install --package-lock-only --legacy-peer-deps
 
       # Шаг 4: Поиск секретов (Gitleaks)
       - name: Run Gitleaks (Secrets)
@@ -33,7 +33,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      # Шаг 5: Проверка библиотек (Trivy) — теперь с установленными пакетами
+      # Шаг 5: ИСПРАВЛЕНО. Указываем Trivy сканировать проект напрямую
       - name: Run Trivy (SCA)
         uses: aquasecurity/trivy-action@master
         with:
@@ -43,7 +43,7 @@ jobs:
           severity: 'HIGH,CRITICAL'
         continue-on-error: true
 
-      # Шаг 6: Новый сканер! Проверяем сам код на SQLi, XSS и баги (Semgrep)
+      # Шаг 6: Проверяем сам код на баги безопасности (Semgrep)
       - name: Run Semgrep (SAST)
         run: |
           pip install semgrep
