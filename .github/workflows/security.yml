@@ -1,29 +1,51 @@
-name: My-First-DevSecOps-Pipeline
+name: DevSecOps-Advanced-Pipeline
 
 on:
   push:
     branches: [ "master", "main" ]
 
 jobs:
-  scanner-job:
+  security-scans:
+    name: Advanced Security Suite
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download code
+      # Шаг 1: Скачиваем код
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check for Leaked Secrets
+      # Шаг 2: Устанавливаем Node.js (нужен для сборки Juice Shop)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Шаг 3: Скачиваем все зависимости, чтобы Trivy смог их увидеть
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      # Шаг 4: Поиск секретов (Gitleaks)
+      - name: Run Gitleaks (Secrets)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true 
+        continue-on-error: true
 
-      - name: Check Libraries for Vulnerabilities
+      # Шаг 5: Проверка библиотек (Trivy) — теперь с установленными пакетами
+      - name: Run Trivy (SCA)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'table'
           severity: 'HIGH,CRITICAL'
+        continue-on-error: true
+
+      # Шаг 6: Новый сканер! Проверяем сам код на SQLi, XSS и баги (Semgrep)
+      - name: Run Semgrep (SAST)
+        run: |
+          pip install semgrep
+          semgrep scan --config auto
+        continue-on-error: true
