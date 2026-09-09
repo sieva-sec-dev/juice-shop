@@ -32,16 +32,17 @@ jobs:
           image-ref: 'bkimminich/juice-shop:latest'
           severity: 'HIGH,CRITICAL'
           format: 'github'
-          output: 'trivy-report.md'
+          output: 'trivy-report.txt'
         continue-on-error: true
 
       - name: Publish Trivy Report to Job Summary
         run: |
-          if [ -s trivy-report.md ]; then
-            cat trivy-report.md >> $GITHUB_STEP_SUMMARY
-          else
-            echo "### 📦 Trivy Container Scan: No high/critical vulnerabilities found!" >> $GITHUB_STEP_SUMMARY
-          fi
+         echo "### 📦 Trivy Container Security Report" >> \$GITHUB_STEP_SUMMARY
+          echo "Below is the list of Critical and High vulnerabilities found inside the Docker image:" >> \$GITHUB_STEP_SUMMARY
+          echo "" >> \$GITHUB_STEP_SUMMARY
+          echo '```text' >> \$GITHUB_STEP_SUMMARY
+          cat trivy-report.txt >> \$GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY     
         if: always()
       
       - name: Run Semgrep (SAST)
