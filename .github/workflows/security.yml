@@ -30,8 +30,10 @@ jobs:
         with:
           scan-type: 'image'
           image-ref: 'bkimminich/juice-shop:latest'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          format: 'template'
+          template: '@/contrib/html.tpl' # Встроенный красивый HTML-шаблон Trivy
+          output: 'trivy-report.html'
         continue-on-error: true
 
       - name: Run Semgrep (SAST)
