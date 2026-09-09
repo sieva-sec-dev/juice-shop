@@ -48,7 +48,7 @@ jobs:
 
       - name: Start Juice Shop application
         run: |
-            docker run --rm -d -r 3000:3000 bkimminich/juice-shop:latest
+            docker run --rm -d -p 3000:3000 bkimminich/juice-shop:latest
             sleep 20
       - name: Run OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
