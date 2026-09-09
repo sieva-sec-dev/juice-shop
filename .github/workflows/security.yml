@@ -35,7 +35,7 @@ jobs:
           output: 'trivy-report.md'
         continue-on-error: true
 
-       - name: Publish Trivy Report to Job Summary
+      - name: Publish Trivy Report to Job Summary
         run: |
           if [ -s trivy-report.md ]; then
             cat trivy-report.md >> $GITHUB_STEP_SUMMARY
