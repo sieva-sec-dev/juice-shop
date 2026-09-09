@@ -30,8 +30,8 @@ jobs:
         with:
           scan-type: 'image'
           image-ref: 'bkimminich/juice-shop:latest'
-          format: 'table'
-          severity: 'HIGH,CRITICAL'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
         continue-on-error: true
 
       - name: Run Semgrep (SAST)
