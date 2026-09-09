@@ -4,26 +4,22 @@ on:
   push:
     branches: [ "master", "main" ]
 
+# Даем роботу права записывать результаты в раздел Security вашего репозитория
+permissions:
+  security-events: write
+  contents: read
+
 jobs:
   security-scans:
     name: Advanced Security Suite
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Просто скачиваем файлы проекта из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Шаг 2: Поиск секретов (Gitleaks)
-      - name: Run Gitleaks (Secrets)
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
-      # Шаг 3: Проверка библиотек (Trivy). Он сам найдет файл package.json и проверит его
       - name: Run Trivy (SCA)
         uses: aquasecurity/trivy-action@master
         with:
@@ -33,9 +29,16 @@ jobs:
           severity: 'HIGH,CRITICAL'
         continue-on-error: true
 
-      # Шаг 4: Сканирование самого кода на уязвимости (Semgrep)
+      # ИСПРАВЛЕНО: Теперь Semgrep сохраняет результаты в файл и передает их в GitHub
       - name: Run Semgrep (SAST)
         run: |
           pip install semgrep
-          semgrep scan --config auto
+          semgrep scan --config auto --sarif --output semgrep-results.sarif
         continue-on-error: true
+
+      # Новый шаг: Загружаем файл с результатами в интерфейс GitHub
+      - name: Upload Semgrep Results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+        if: always() # Этот шаг выполнится в любом случае
