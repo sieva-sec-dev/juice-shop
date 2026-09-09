@@ -54,7 +54,7 @@ jobs:
             
       - name: Run OWASP ZAP Baseline Scan
         run: |
-         docker run --rm -v \${{ github.workspace }}:/zap/wrk/:rw owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000 -g gen.conf -r report.html
+         docker run --rm -v \${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -g gen.conf -r report.html
         continue-on-error: true
         
       - name: Save DAST Report Artifact
