@@ -62,7 +62,13 @@ export function getUserProfile () {
           if (!code) {
             throw new Error('Username is null')
           }
-          username = eval(code) // eslint-disable-line no-eval
+          
+      try   {
+         username = JSON.parse(code);
+            } catch (e) {
+              username = code;
+                        }
+
         } catch (err) {
           username = '\\' + username
         }
