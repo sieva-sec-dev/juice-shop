@@ -63,7 +63,7 @@ jobs:
         if: always()
         
       - name: Upload DAST HTML Report
-        uses: actions/artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: zap-dast-vulnerabilities-report
           path: report.html
