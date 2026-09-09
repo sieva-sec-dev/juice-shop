@@ -7,6 +7,7 @@ on:
 permissions:
   security-events: write
   contents: read
+  issues: write
 
 jobs:
   security-scans:
@@ -54,5 +55,5 @@ jobs:
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: 'http://localhost:3000'
-          token: ''
+          token: ${{ secrets.GITHUB_TOKEN }}
        
