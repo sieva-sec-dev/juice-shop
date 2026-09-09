@@ -29,11 +29,10 @@ jobs:
       - name: Run Trivy (SCA)
         run: |
           sudo apt-get update && sudo apt-get install -y wget apt-transport-https gnupg lsb-release
-          wget -qO - https://github.io | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://github.io \$(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb \$(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
           sudo apt-get update && sudo apt-get install -y trivy
-          wget https://githubusercontent.com
-          trivy image --severity HIGH,CRITICAL --format template --template @html.tpl --output trivy-report.html bkimminich/juice-shop:latest
+          trivy image --severity HIGH,CRITICAL --format template --template "@html.tpl" --output trivy-report.html bkimminich/juice-shop:latest
         continue-on-error: true
 
       - name: Upload Trivy HTML Report
