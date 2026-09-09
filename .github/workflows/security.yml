@@ -37,11 +37,11 @@ jobs:
 
       - name: Publish Trivy Report to Job Summary
         run: |
-         echo "### 📦 Trivy Container Security Report" >> \$GITHUB_STEP_SUMMARY
-          echo "Below is the list of Critical and High vulnerabilities found inside the Docker image:" >> \$GITHUB_STEP_SUMMARY
-          echo "" >> \$GITHUB_STEP_SUMMARY
-          echo '```text' >> \$GITHUB_STEP_SUMMARY
-          cat trivy-report.txt >> \$GITHUB_STEP_SUMMARY
+         echo "### 📦 Trivy Container Security Report" >> $GITHUB_STEP_SUMMARY
+          echo "Below is the list of Critical and High vulnerabilities found inside the Docker image:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          cat trivy-report.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY     
         if: always()
       
