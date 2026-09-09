@@ -31,16 +31,18 @@ jobs:
           scan-type: 'image'
           image-ref: 'bkimminich/juice-shop:latest'
           severity: 'HIGH,CRITICAL'
-          format: 'template'
-          template: '@/contrib/html.tpl' # Встроенный красивый HTML-шаблон Trivy
-          output: 'trivy-report.html'
+          format: 'github'
+          output: 'trivy-report.md'
         continue-on-error: true
 
-      - name: Upload Trivy HTML Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: Trivy-Container-Security-Report
-          path: trivy-report.html
+       - name: Publish Trivy Report to Job Summary
+        run: |
+          if [ -s trivy-report.md ]; then
+            cat trivy-report.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### 📦 Trivy Container Scan: No high/critical vulnerabilities found!" >> $GITHUB_STEP_SUMMARY
+          fi
+        if: always()
       
       - name: Run Semgrep (SAST)
         run: |
