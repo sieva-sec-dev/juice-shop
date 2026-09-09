@@ -36,6 +36,12 @@ jobs:
           output: 'trivy-report.html'
         continue-on-error: true
 
+      - name: Upload Trivy HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trivy-Container-Security-Report
+          path: trivy-report.html
+      
       - name: Run Semgrep (SAST)
         run: |
           pip install semgrep
