@@ -26,6 +26,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'table'
+          vuln-type: 'library'
           severity: 'HIGH,CRITICAL'
         continue-on-error: true
 
