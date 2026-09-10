@@ -27,7 +27,7 @@ jobs:
         continue-on-error: true
       
       - name: Run Trivy
-        uses: aquasecurity/trivy-action@v0.74.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'image'
           image-ref: 'bkimminich/juice-shop:latest'
