@@ -30,9 +30,14 @@ jobs:
       
       - name: Run Trivy (SCA)
         run: |
-          curl -sSfL https://githubusercontent.com -o html.tpl
-          docker run --rm -v ${{ github.workspace }}:/root/ ghcr.io/aquasecurity/trivy:latest image --severity HIGH,CRITICAL --format json --output /root/trivy-report.json bkimminich/juice-shop:latest
-          sudo chmod 777 trivy-report.json
+          uses: aquasecurity/trivy-action@master
+          with:
+          scan-type: 'image'
+          image-ref: 'bkimminich/juice-shop:latest'
+          severity: 'HIGH,CRITICAL'
+          # Просим плагин сделать чистый JSON-файл (без ломающихся шаблонов)
+          format: 'json'
+          output: 'trivy-report.json'
         continue-on-error: true       
      
       - name: Run Semgrep (SAST)
