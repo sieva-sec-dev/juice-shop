@@ -26,14 +26,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
       
-      - name: Install Trivy Tool
-        uses: aquasecurity/setup-trivy@v0.2.2
-        
-      - name: Scan Docker Image to HTML
-        run: |
-          trivy image --severity HIGH,CRITICAL --format template --template "@html" --output trivy-report.html bkimminich/juice-shop:latest
-        continue-on-error: true
-        
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'image'
+          image-ref: 'bkimminich/juice-shop:latest'
+          severity: 'HIGH,CRITICAL'
+          # Просим плагин использовать встроенный HTML шаблон
+          format: 'template'
+          template: '@contrib/html.tpl'
+          output: 'trivy-report.html'
+          continue-on-error: true
+          
       - name: Upload Trivy HTML Report
         uses: actions/upload-artifact@v4
         with:
