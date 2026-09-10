@@ -52,15 +52,13 @@ jobs:
             
       - name: Run OWASP ZAP DAST Scan
         run: |
-           docker run --name zap-scanner --network="host" ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -x zap-report.xml
+           docker run --rm --user root --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -x zap-report.xml
         continue-on-error: true
 
       - name: Extract XML Report from Docker
         run: |
-          docker cp zap-scanner:/zap/zap-report.xml ./zap-report.xml
           sudo chmod 777 zap-report.xml
-          docker rm zap-scanner
-        if: always()
+          if: always()
         
       - name: Archive All DefectDojo Reports
         uses: actions/upload-artifact@v4
