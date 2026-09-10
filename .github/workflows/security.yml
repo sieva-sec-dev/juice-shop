@@ -52,9 +52,9 @@ jobs:
             
       - name: Run OWASP ZAP DAST Scan
         run: |
-           touch zap-report.json
-           chmod 777 zap-report.json
-           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -J zap-report.json -I
+           touch zap-report.xml
+           chmod 777 zap-report.xml
+           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r zap-report.xml -I
         continue-on-error: true
         
       - name: Archive All DefectDojo Reports
@@ -65,6 +65,6 @@ jobs:
             gitleaks-results.sarif
             trivy-report.json
             semgrep-results.sarif
-            zap-report.json
+            zap-report.xml
         if: always()
        
