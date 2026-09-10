@@ -26,15 +26,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
       
-      - name: Run Trivy
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: 'image'
-          image-ref: 'bkimminich/juice-shop:latest'
-          severity: 'HIGH,CRITICAL'
-          format: 'template'
-          template: "@$HOME/.local/bin/trivy-bin/contrib/html.tpl"
-          output: 'trivy-report.html'
+      - name: Run Trivy (SCA)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl -o html.tpl
+          docker run --rm -v ${{ github.workspace }}:/root/ ghcr.io/aquasecurity/trivy:latest image --severity HIGH,CRITICAL --format template --template "@/root/html.tpl" --output /root/trivy-report.html bkimminich/juice-shop:latest
+          sudo chmod 777 trivy-report.html
         continue-on-error: true
           
       - name: Upload Trivy HTML Report
