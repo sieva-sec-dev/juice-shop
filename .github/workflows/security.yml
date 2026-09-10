@@ -29,9 +29,8 @@ jobs:
         continue-on-error: true
       
       - name: Run Trivy (SCA)
-        run: |
-          uses: aquasecurity/trivy-action@master
-          with:
+        uses: aquasecurity/trivy-action@master
+        with:
           scan-type: 'image'
           image-ref: 'bkimminich/juice-shop:latest'
           severity: 'HIGH,CRITICAL'
