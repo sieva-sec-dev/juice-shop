@@ -52,10 +52,13 @@ jobs:
             
       - name: Run OWASP ZAP DAST Scan
         run: |
-           touch zap-report.xml
-           chmod 777 zap-report.xml
-           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r zap-report.xml -I
+           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r zap-report.xml
         continue-on-error: true
+
+      - name: Fix XML Permissions for GitHub
+        run: |
+          sudo chmod 777 zap-report.xml
+        if: always()
         
       - name: Archive All DefectDojo Reports
         uses: actions/upload-artifact@v4
