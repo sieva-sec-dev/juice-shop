@@ -52,7 +52,7 @@ jobs:
             
       - name: Run OWASP ZAP DAST Scan
         run: |
-           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r zap-report.xml
+           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -x zap-report.xml
         continue-on-error: true
 
       - name: Fix XML Permissions for GitHub
