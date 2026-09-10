@@ -7,8 +7,7 @@ on:
 permissions:
   security-events: write
   contents: read
-  issues: write
-
+  
 jobs:
   security-scans:
     name: Advanced Security Suite
@@ -24,49 +23,44 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+          format: 'sarif'
+          output: 'gitleaks-results.sarif'
         continue-on-error: true
       
       - name: Run Trivy (SCA)
         run: |
-          curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl -o html.tpl
-          docker run --rm -v ${{ github.workspace }}:/root/ ghcr.io/aquasecurity/trivy:latest image --severity HIGH,CRITICAL --format template --template "@/root/html.tpl" --output /root/trivy-report.html bkimminich/juice-shop:latest
-          sudo chmod 777 trivy-report.html
-        continue-on-error: true
-          
-      - name: Upload Trivy HTML Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-container-vulnerabilities-report
-          path: trivy-report.html
-        if: always()
-      
+          curl -sSfL https://githubusercontent.com -o html.tpl
+          docker run --rm -v ${{ github.workspace }}:/root/ ghcr.io/aquasecurity/trivy:latest image --severity HIGH,CRITICAL --format json --output /root/trivy-report.json bkimminich/juice-shop:latest
+          sudo chmod 777 trivy-report.json
+        continue-on-error: true       
+     
       - name: Run Semgrep (SAST)
         run: |
           pip install semgrep
           semgrep scan --config auto --sarif --output semgrep-results.sarif
         continue-on-error: true
 
-      - name: Upload Semgrep Results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep-results.sarif
-        if: always()
-
       - name: Start Juice Shop application
         run: |
             docker run --rm -d -p 3000:3000 bkimminich/juice-shop:latest
             sleep 20
             
-      - name: Run OWASP ZAP Baseline Scan
+      - name: Run OWASP ZAP DAST Scan
         run: |
-           touch report.html
-           chmod 777 report.html
-           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -r report.html -I
+           touch zap-report.json
+           chmod 777 zap-report.json
+           docker run --rm --network="host" -v ${{ github.workspace }}:/zap/wrk/:rw ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://localhost:3000 -J zap-report.json -I
         continue-on-error: true
         
-      - name: Upload DAST HTML Report
+      - name: Archive All DefectDojo Reports
         uses: actions/upload-artifact@v4
         with:
-          name: zap-dast-vulnerabilities-report
-          path: report.html
+          name: defectdojo-raw-reports
+          path: |
+            gitleaks-results.sarif
+            trivy-report.json
+            semgrep-results.sarif
+            zap-report.json
+        if: always()
        
