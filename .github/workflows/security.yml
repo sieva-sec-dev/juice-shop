@@ -27,16 +27,15 @@ jobs:
         continue-on-error: true
       
       - name: Run Trivy
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@v0.70.0
         with:
           scan-type: 'image'
           image-ref: 'bkimminich/juice-shop:latest'
           severity: 'HIGH,CRITICAL'
-          # Просим плагин использовать встроенный HTML шаблон
           format: 'template'
-          template: '@contrib/html.tpl'
+          template: "@$HOME/.local/bin/trivy-bin/contrib/html.tpl"
           output: 'trivy-report.html'
-          continue-on-error: true
+        continue-on-error: true
           
       - name: Upload Trivy HTML Report
         uses: actions/upload-artifact@v4
