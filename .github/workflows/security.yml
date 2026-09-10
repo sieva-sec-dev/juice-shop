@@ -58,7 +58,7 @@ jobs:
       - name: Extract XML Report from Docker
         run: |
           sudo chmod 777 zap-report.xml
-          if: always()
+        if: always()
         
       - name: Archive All DefectDojo Reports
         uses: actions/upload-artifact@v4
